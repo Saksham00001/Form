@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.7/css/pico.min.css">
+    <style>
+        /* overrides */
+
+        #errors {
+            display: none;
+            color: red;
+        }
+
+        .display-block {
+            display: block !important;
+        }
+
+        body > nav {
+            z-index: 99;
+position: fixed;
+top: 0;
+right: 0;
+left: 0;
+padding: 0 var(--spacing);
+background-color: var(--card-background-color);
+box-shadow: var(--card-box-shadow);
+        }
+
+        @media (min-width: 1200px) {
+            :root {
+                --font-size: 16px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            :root {
+                --font-size: 16px;
+            }
+
+            article {
+                --block-spacing-vertical: calc(var(--spacing) * 2.0);
+            }
+        }
+
+        @media (min-width: 768px) {
+            :root {
+                --font-size: 16px;
+            }
+        }
+
+        #company_name {
+            margin: 0 !important;
+            font-size: 1.25rem;
+            text-transform: uppercase;
+        }
+
+        #errors a {
+            display: block;
+            width: 1rem;
+            height: 1rem;
+            margin-top: calc(var(--block-spacing-vertical) * -.5);
+            margin-bottom: var(--typography-spacing-vertical);
+            margin-left: auto;
+            background-image: var(--icon-close);
+            background-position: center;
+            background-size: auto 1rem;
+            background-repeat: no-repeat;
+            opacity: .5;
+            transition: opacity var(--transition);
+        }
+
+
+
+
+    </style>
+    <title>Form</title>
+</head>
+
+<body>
+    <nav>
+        <ul></ul>
+        <ul>
+            <li><h1 id="company_name">Calls Media Solution</h1></li>
+        </ul>
+        <ul></ul>
+    </nav>
+
+    <main class="container">
+        <article id="errors">
+            <a href="#"
+                aria-label="Close"
+                class="close"
+                onClick="closeError()">
+            </a>
+            <h4>Errors</h4>
+            <div id="error-child">
+
+            </div>
+        </article>
+        <article>
+            <form action="">
+
+                <div class="grid">
+                    <label for="first_name">First Name
+                        <input required type="text" name="first_name" id="first_name" 
+                            placeholder="Eg. John">
+                    </label>
+                    <label for="last_name">Last Name
+                        <input required type="text" name="last_name" id="last_name" placeholder="Eg. Doe"
+                            >
+                    </label>
+                </div>
+
+                <div class="grid">
+
+                    <label for="phone_1">Contact Number
+
+                        <input required type="text" name="phone_1" id="phone_1" placeholder="Eg. 757123456"
+                            pattern="\d+" >
+                    </label>
+                    <label for="campaign_id">Campaign Id
+
+                        <input required type="text" name="campaign_id" id="campaign_id"
+                            placeholder="Eg. CAb5d40de0406b4c1fa000000000000000" >
+                    </label>
+                </div>
+
+
+                <label for="universal_leadid">Universal Lead Id
+
+                    <input required type="text" name="universal_leadid" id="universal_leadid"
+                        placeholder="Eg. 743XXXXX-XXXX-XXXX-XXXX-XXXXXXX88888" >
+                </label>
+                <div class="grid">
+                    <label for="email">Email
+
+                        <input required type="email" name="email" id="email" placeholder="Eg. johndoe@email.com"
+                            >
+                    </label>
+
+
+                    <label for="dob">Date Of Birth (Date/Month/Year)
+
+                        <input required type="date" name="dob" id="dob" placeholder="Eg. 1998-02-02" >
+                    </label>
+                </div>
+                <div class="grid">
+                    <label for="address_1">Address
+
+                        <input required type="text" name="address_1" id="address_1" placeholder="Street Address"
+                            >
+                    </label>
+
+
+                    <label for="city">City
+
+                        <input required type="text" name="city" id="city" placeholder="Eg. Tampa" >
+                    </label>
+                </div>
+
+                <div class="grid">
+                    <label for="state">State Code
+                        <input required type="text" name="state" id="state" placeholder="Eg. FL" >
+                    </label>
+
+                    <label for="postal_code">Postal Code
+
+                        <input required type="text" name="postal_code" id="postal_code" pattern="\d+"
+                            placeholder="Eg. 33914">
+                    </label>
+                </div>
+                <div class="grid">
+                    <input aria-busy="" type="reset" value="Reset"/>
+                    <button aria-busy="" type="submit">Submit</button>
+                </div>
+            </form>
+        </article>
+    </main>
+    <dialog id="modal-example">
+        <article style="width: 70%">
+          <a href="#close"
+            aria-label="Close"
+            class="close"
+            data-target="modal-example"
+            onClick="closeModal()">
+          </a>
+        <h3>Success</h3>
+        <div><strong>Lead Id: </strong><span id="lead_id"></span></div>
+        <div><strong>Price: </strong><span id="price"></span></div>
+        </article>
+      </dialog>
+
+    <script>
+        const form = document.querySelector('form')
+        const submitBtn = document.querySelector('button[type="submit"]')
+        //    const modal = document.querySelector('modal')
+
+        function sendRequest() {
+            const linkToSubmit = 'https://ypjvty7a2krzkmyo7mfbhntwzy0fozac.lambda-url.us-east-1.on.aws/'
+            var myHeaders = new Headers();
+            myHeaders.append("content-type", "application/x-www-form-urlencoded");
+
+            const elements = form.elements
+            var urlencoded = new URLSearchParams();
+            for (const ele of elements) {
+                if (ele.type === "submit" || ele.type === "reset") continue
+                urlencoded.append(ele.name, ele.value)
+            }
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: urlencoded,
+                redirect: 'follow'
+            };
+
+            fetch(linkToSubmit,requestOptions)
+            .then(res => {
+                if (res.status === 201) {
+                    return res.json()
+                } else {
+                    throw new Error(res);;
+                }
+            }).then(data => {
+                if (data.outcome === "success") {
+                    showModal(data)
+                } else {
+                    showError(data)
+                }
+            }).catch(err => {
+                console.log({err})
+            })
+        }
+
+        form.addEventListener('submit', (e) => {
+            event.preventDefault();
+            submitBtn.setAttribute('aria-busy', 'true')
+            sendRequest();
+        })
+
+        function showModal(data) {
+            const leadId = document.getElementById('lead_id')
+            const price = document.getElementById('price')
+            leadId.innerHTML = data.lead.id
+            price.innerHTML = data.price
+            modal.open = "true"
+            const elements = form.elements
+            form.reset()
+            submitBtn.setAttribute('aria-busy', '')
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal-example') 
+            const leadId = document.getElementById('lead_id')
+            const price = document.getElementById('price')
+            leadId.innerHTML = ""
+            price.innerHTML = ""
+            modal.open = false
+        }
+
+        function showError(data) {
+            const errorArticle = document.getElementById('errors')
+            const errorChild= document.getElementById('error-child')
+            errorChild.innerHTML = data.reason
+            errorArticle.classList.add('display-block')
+            submitBtn.setAttribute('aria-busy', '')
+            document.body.focus()
+            form.reset()
+        }
+
+        function closeError() {
+            const errorArticle = document.getElementById('errors')
+            const errorChild= document.getElementById('error-child')
+            errorChild.innerHTML = ''
+            errorArticle.classList.remove('display-block')
+        }
+
+    </script>
+
+</body>
+
+</html>
